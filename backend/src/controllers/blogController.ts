@@ -1,109 +1,145 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import * as blogService from '../services/blogService';
+import { JwtPayload } from 'jsonwebtoken';
 
-const prisma = new PrismaClient({
-  omit: {
-    user: {
-      password: true
-    }
-  }
-})
-
-interface AuthRequest extends Request {
-  user?: { id: number };
+interface AuthenticatedRequest extends Request {
+  user?: JwtPayload & { userId: number };
 }
 
-export const createBlog = async (req: AuthRequest, res: Response) => {
-  const { title, content } = req.body;
-  const authorId = req.user?.id;
-
-  if (!authorId) {
-    return res.status(401).json({ error: 'User not authenticated' });
-  }
-
+export const createBlog = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    console.log('Attempting to create blog with:', { title, content, authorId });
-    const blog = await prisma.blog.create({
-      data: { title, content, authorId },
-    });
+    const { title, content, category } = req.body;
+    const authorId = req.user?.userId;
+    console.log('Attempting to create blog with authorId:', authorId);
+    if (!authorId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const blog = await blogService.createBlog(title, content, category, authorId);
     res.status(201).json(blog);
   } catch (error) {
-    console.error('Error creating blog:', error);
-    res.status(500).json({ 
-      error: 'Error creating blog', 
-      details: error instanceof Error ? error.message : String(error)
-    });
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: 'An unexpected error occurred' });
+    }
   }
 };
 
 export const getBlogs = async (req: Request, res: Response) => {
   try {
-    const blogs = await prisma.blog.findMany({
-      include: {
-        author: {
-          omit: {
-            email: true // Omit email locally, in addition to the globally omitted password
-          }
-        },
-      },
-    });
+    const blogs = await blogService.getBlogs();
     res.json(blogs);
   } catch (error) {
-    console.error('Error fetching blogs:', error);
-    res.status(500).json({ 
-      error: 'Error fetching blogs', 
-      details: error instanceof Error ? error.message : String(error)
-    });
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: 'An unexpected error occurred' });
+    }
   }
 };
 
 export const getBlogById = async (req: Request, res: Response) => {
-  const { id } = req.params;
   try {
-    const blog = await prisma.blog.findUnique({
-      where: { id: Number(id) },
-      include: { author: true },
-    });
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid blog ID' });
+    }
+
+    const blog = await blogService.getBlogById(id);
     if (!blog) {
       return res.status(404).json({ error: 'Blog not found' });
     }
+
     res.json(blog);
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching blog' });
+    console.error('Error in getBlogById:', error);
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: 'An unexpected error occurred' });
+    }
   }
 };
 
-export const updateBlog = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { title, content } = req.body;
-  const authorId = (req as AuthRequest).user?.id;
-
+export const updateBlog = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    console.log('Attempting to update blog with:', { title, content, authorId });
-    const updatedBlog = await prisma.blog.update({
-      where: { id: Number(id) },
-      data: { title, content },
-    });
-    res.json(updatedBlog);
+    const { id } = req.params;
+    const { title, content, category } = req.body;
+    const authorId = req.user?.userId;
+    if (!authorId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const blog = await blogService.updateBlog(parseInt(id), title, content, category, authorId);
+    res.json(blog);
   } catch (error) {
-    console.error('Error updating blog:', error);
-    res.status(500).json({ 
-      error: 'Error updating blog', 
-      details: error instanceof Error ? error.message : String(error)
-    });
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: 'An unexpected error occurred' });
+    }
   }
 };
 
-export const deleteBlog = async (req: Request, res: Response) => {
-  const { id } = req.params;
+
+export const deleteBlog = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    console.log('Attempting to delete blog with id:', { id });
-    await prisma.blog.delete({
-      where: { id: Number(id) },
-    });
-    res.status(204).send().json('Blog deleted successfully');
-    console.log('Blog deleted successfully');
+    const { id } = req.params;
+    const authorId = req.user?.userId;
+    if (!authorId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    await blogService.deleteBlog(parseInt(id), authorId);
+    res.json({ message: 'Blog deleted successfully' });
   } catch (error) {
-    res.status(500).json({ error: 'Error deleting blog' });
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: 'An unexpected error occurred' });
+    }
+  }
+};
+
+export const shareBlog = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { blogId, userId, permission } = req.body;
+    const authorId = req.user?.userId;
+    if (!authorId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const sharedBlog = await blogService.shareBlog(blogId, userId, permission, authorId);
+    res.status(201).json(sharedBlog);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: 'An unexpected error occurred' });
+    }
+  }
+};
+
+export const getSharedBlogs = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    console.log(`Fetching shared blogs for user: ${userId}`);
+    const sharedBlogs = await blogService.getSharedBlogs(userId);
+    
+    if (sharedBlogs.length === 0) {
+      console.log(`No shared blogs found for user: ${userId}`);
+      return res.status(204).send(); // No Content
+    }
+    
+    console.log(`Successfully retrieved ${sharedBlogs.length} shared blogs for user: ${userId}`);
+    res.json(sharedBlogs);
+  } catch (error) {
+    console.error('Error in getSharedBlogs:', error);
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: 'An unexpected error occurred' });
+    }
   }
 };

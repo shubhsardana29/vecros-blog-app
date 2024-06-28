@@ -15,19 +15,31 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String 
-  name     String
-  blogs    Blog[]
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  blogs     Blog[]
+  sharedBlogs SharedBlog[]
 }
 
 model Blog {
   id        Int      @id @default(autoincrement())
   title     String
   content   String
+  category  String
   authorId  Int
   author    User     @relation(fields: [authorId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  sharedWith SharedBlog[]
+}
+
+model SharedBlog {
+  id        Int      @id @default(autoincrement())
+  blogId    Int
+  blog      Blog     @relation(fields: [blogId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  permission String  // 'view' or 'edit'
 }
