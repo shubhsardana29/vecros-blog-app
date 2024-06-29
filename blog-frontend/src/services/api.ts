@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import { Blog } from '../types/blog';
 import { User, LoginResponse, RegisterResponse } from '../types/user';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://localhost:5000';
 
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,

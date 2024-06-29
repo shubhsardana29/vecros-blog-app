@@ -3,41 +3,49 @@ import { User } from '../../types/user';
 
 interface AuthState {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  message: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
+  token: null,
   isAuthenticated: false,
   loading: false,
   error: null,
+  message: null,
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    loginStart: (state) => {
-      state.loading = true;
-    },
-    loginSuccess: (state, action: PayloadAction<User>) => {
+    setUser: (state, action: PayloadAction<User | null>) => {
       state.user = action.payload;
-      state.isAuthenticated = true;
-      state.loading = false;
-      state.error = null;
+      state.isAuthenticated = !!action.payload;
     },
-    loginFailure: (state, action: PayloadAction<string>) => {
-      state.loading = false;
+    setToken: (state, action: PayloadAction<string | null>) => {
+      state.token = action.payload;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    logout: (state) => {
-      state.user = null;
-      state.isAuthenticated = false;
+    setMessage: (state, action: PayloadAction<string | null>) => {
+      state.message = action.payload;
+    },
+    clearMessages: (state) => {
+      state.error = null;
+      state.message = null;
     },
   },
 });
 
-export const { loginStart, loginSuccess, loginFailure, logout } = authSlice.actions;
+export const { setUser, setToken, setLoading, setError, setMessage, clearMessages } = authSlice.actions;
+
 export default authSlice.reducer;
