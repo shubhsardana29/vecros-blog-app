@@ -78,9 +78,10 @@ export const deleteBlog = createAsyncThunk(
 
 export const shareBlog = createAsyncThunk(
   'blog/shareBlog',
-  async (shareData: { blogId: number; userId: number; permission: string }, { rejectWithValue }) => {
+  async (shareData: { blogId: number; userId: number; permission: 'view' | 'edit' }, { rejectWithValue }) => {
     try {
-      await api.shareBlog(shareData);
+      const response = await api.shareBlog(shareData);
+      return response.data;
     } catch (error: unknown) {
       const apiError = error as ApiError;
       return rejectWithValue(apiError.response?.data?.message || 'Failed to share blog');
@@ -88,7 +89,7 @@ export const shareBlog = createAsyncThunk(
   }
 );
 
-export const getSharedBlogs = createAsyncThunk(
+export const fetchSharedBlogs = createAsyncThunk(
   'blog/getSharedBlogs',
   async (_, { rejectWithValue }) => {
     try {

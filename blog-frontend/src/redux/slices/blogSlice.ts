@@ -1,16 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Blog } from '../../types/blog';
-import { fetchBlogs, fetchBlogById, deleteBlog } from '../thunks/blogThunks';
+import { fetchBlogs, fetchBlogById, deleteBlog, fetchSharedBlogs } from '../thunks/blogThunks';
 
 interface BlogState {
     blogs: Blog[];  
-    currentBlog: Blog | null;
+  currentBlog: Blog | null;
+  sharedBlogs: Blog[];
     loading: boolean;
     error: string | null;
 }
 
 const initialState: BlogState = {
-    blogs: [],
+  blogs: [],
+  sharedBlogs: [],
     currentBlog: null,
     loading: false,
     error: null,
@@ -74,6 +76,18 @@ const blogSlice = createSlice({
       .addCase(deleteBlog.rejected, (state, action) => {
         state.error = action.payload as string;
         state.loading = false;
+      })
+      .addCase(fetchSharedBlogs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSharedBlogs.fulfilled, (state, action: PayloadAction<Blog[]>) => {
+        state.sharedBlogs = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchSharedBlogs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch shared blogs';
       });
   },
 });

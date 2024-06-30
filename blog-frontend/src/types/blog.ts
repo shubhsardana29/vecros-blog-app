@@ -5,8 +5,11 @@ export interface Blog {
     category: string;
     authorId: number;
     author: {
+      email: string;
       name: string;
     };
     createdAt: string;
-    updatedAt: string;
+  updatedAt: string;
+  sharedAt?: string;
+  permission?: 'view' | 'edit';
   }

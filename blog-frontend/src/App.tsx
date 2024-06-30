@@ -14,6 +14,7 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import { lightTheme, darkTheme } from './utils/theme';
 import { RootState } from './redux/store';
+import SharedBlogsPage from './pages/SharedBlogsPage';
 
 const App: React.FC = () => {
   const darkMode = useSelector((state: RootState) => state.theme.darkMode);
@@ -32,6 +33,7 @@ const App: React.FC = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/shared-blogs" element={<SharedBlogsPage />} />
         </Routes>
         <Footer />
       </Router>

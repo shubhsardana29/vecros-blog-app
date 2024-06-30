@@ -13,13 +13,19 @@ const Header: React.FC = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" component={Link} to="/" style={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}>
+        <Typography
+          variant="h6"
+          component={Link}
+          to="/"
+          style={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}
+        >
           Blog App
         </Typography>
         <Button color="inherit" component={Link} to="/">Home</Button>
         {isAuthenticated ? (
           <>
             <Button color="inherit" component={Link} to="/dashboard">Dashboard</Button>
+            <Button color="inherit" component={Link} to="/shared-blogs">Shared Blogs</Button>
             <Logout />
           </>
         ) : (
