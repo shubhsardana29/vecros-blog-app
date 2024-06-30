@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Blog } from '../../types/blog';
+import { fetchBlogs } from '../thunks/blogThunks';
 
 interface BlogState {
-    blogs: Blog[];
-    userBlogs: Blog[];
+    blogs: Blog[];  
   currentBlog: Blog | null;
   loading: boolean;
   error: string | null;
@@ -11,7 +11,6 @@ interface BlogState {
 
 const initialState: BlogState = {
     blogs: [],
-    userBlogs: [],
   currentBlog: null,
   loading: false,
   error: null,
@@ -39,6 +38,21 @@ const blogSlice = createSlice({
     clearCurrentBlog: (state) => {
       state.currentBlog = null;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchBlogs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchBlogs.fulfilled, (state, action: PayloadAction<Blog[]>) => {
+        state.blogs = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchBlogs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch user blogs';
+      });
   },
 });
 

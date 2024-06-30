@@ -114,15 +114,4 @@ export const fetchBlogsByCategory = createAsyncThunk(
   }
 );
 
-export const fetchUserBlogs = createAsyncThunk(
-  'blog/fetchUserBlogs',
-  async (userId: number, { rejectWithValue }) => {
-    try {
-      const response = await api.fetchUserBlogs(userId);
-      return response.data;
-    } catch (error: unknown) {
-      const apiError = error as ApiError;
-      return rejectWithValue(apiError.response?.data?.message || 'Failed to fetch user blogs');
-    }
-  }
-);
+
