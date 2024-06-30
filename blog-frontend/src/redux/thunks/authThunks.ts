@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import * as api from '../../services/api';
 import { User } from '../../types/user';
-import { setUser, setToken, setLoading, setError, setMessage } from '../slices/authSlice';
+import { setUser, setToken, setLoading, setError, setMessage , clearUser} from '../slices/authSlice';
 
 // Define a custom error type
 interface ApiError extends Error {
@@ -30,6 +30,7 @@ export const register = createAsyncThunk(
     }
   }
 );
+
 
 export const login = createAsyncThunk(
   'auth/login',
@@ -69,6 +70,7 @@ export const logout = createAsyncThunk(
       dispatch(setUser(null));
       dispatch(setToken(null));
       dispatch(setMessage('Logged out successfully'));
+      dispatch(clearUser());
     } catch (error: unknown) {
       const errorMessage = 'Logout failed';
       dispatch(setError(errorMessage));

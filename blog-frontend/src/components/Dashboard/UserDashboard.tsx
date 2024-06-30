@@ -1,37 +1,64 @@
 import React from 'react';
-import { Typography, List, ListItem, ListItemText, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Typography, List, ListItem, ListItemText, Button, IconButton, Box } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import { Blog } from '../../types/blog';
+import { useDispatch } from 'react-redux';
+import { deleteBlog } from '../../redux/thunks/blogThunks';
+import { AppDispatch } from '../../redux/store';
 
 interface UserDashboardProps {
   userBlogs: Blog[];
 }
 
 const UserDashboard: React.FC<UserDashboardProps> = ({ userBlogs }) => {
-  console.log('Rendering UserDashboard - userBlogs:', userBlogs);
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   if (!userBlogs || userBlogs.length === 0) {
     return <Typography>You haven't created any blogs yet.</Typography>;
   }
 
+  const handleDelete = (blogId: number) => {
+    if (window.confirm('Are you sure you want to delete this blog?')) {
+      dispatch(deleteBlog(blogId));
+    }
+  };
+
+  const handleBlogClick = (blogId: number) => {
+    navigate(`/blog/${blogId}`);
+  };
+
   return (
-    <div>
+    <Box>
       <Typography variant="h4" gutterBottom>Your Blogs</Typography>
-      <Button variant="contained" color="primary" component={Link} to="/create">
-        Create New Blog
+      <Button variant="contained" color="primary" component={Link} to="/create" sx={{ mb: 2 }}>
+        CREATE NEW BLOG
       </Button>
       <List>
         {userBlogs.map((blog) => (
-          <ListItem key={blog.id}>
-            <ListItemText 
-              primary={blog.title} 
-              secondary={`Created: ${new Date(blog.createdAt).toLocaleString()}`} 
+          <ListItem 
+            key={blog.id}
+            sx={{ 
+              cursor: 'pointer', 
+              '&:hover': { backgroundColor: 'action.hover' }
+            }}
+            onClick={() => handleBlogClick(blog.id)}
+          >
+            <ListItemText
+              primary={blog.title}
+              secondary={`Created: ${new Date(blog.createdAt).toLocaleString()}`}
             />
-            <Button component={Link} to={`/edit/${blog.id}`}>Edit</Button>
+            <IconButton onClick={(e) => { e.stopPropagation(); navigate(`/edit/${blog.id}`); }}>
+              <EditIcon />
+            </IconButton>
+            <IconButton onClick={(e) => { e.stopPropagation(); handleDelete(blog.id); }}>
+              <DeleteIcon />
+            </IconButton>
           </ListItem>
         ))}
       </List>
-    </div>
+    </Box>
   );
 };
 

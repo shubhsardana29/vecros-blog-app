@@ -1,19 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Blog } from '../../types/blog';
-import { fetchBlogs } from '../thunks/blogThunks';
+import { fetchBlogs, fetchBlogById, deleteBlog } from '../thunks/blogThunks';
 
 interface BlogState {
     blogs: Blog[];  
-  currentBlog: Blog | null;
-  loading: boolean;
-  error: string | null;
+    currentBlog: Blog | null;
+    loading: boolean;
+    error: string | null;
 }
 
 const initialState: BlogState = {
     blogs: [],
-  currentBlog: null,
-  loading: false,
-  error: null,
+    currentBlog: null,
+    loading: false,
+    error: null,
 };
 
 const blogSlice = createSlice({
@@ -52,6 +52,28 @@ const blogSlice = createSlice({
       .addCase(fetchBlogs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch user blogs';
+      })
+      // Add these cases for fetchBlogById
+      .addCase(fetchBlogById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchBlogById.fulfilled, (state, action: PayloadAction<Blog>) => {
+        state.currentBlog = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchBlogById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch blog details';
+        state.currentBlog = null;
+      })
+      .addCase(deleteBlog.fulfilled, (state, action) => {
+        state.blogs = state.blogs.filter(blog => blog.id !== action.payload);
+        state.loading = false;
+      })
+      .addCase(deleteBlog.rejected, (state, action) => {
+        state.error = action.payload as string;
+        state.loading = false;
       });
   },
 });
