@@ -7,7 +7,7 @@ A full-stack blog application with user authentication, CRUD operations for blog
 - User registration and authentication
 - Create, read, update, and delete blog posts
 - Share blogs with other users
-- Category-based blog filtering
+- Search blogs/ filtering
 - User dashboard
 - Responsive design
 - Dark mode toggle
@@ -119,24 +119,61 @@ permission String
 ## API Endpoints
 
 ### Authentication
-- POST /api/auth/register: Register a new user
-- POST /api/auth/login: Login user
+- POST /auth/register: Register a new user
+ ```
+{
+    "name": "Shubh",
+    "email": "shubh@example.com",
+    "password": "password"
+}
+```
+- POST /auth/login: Login user
+```
+{
+    "email": "johnupdated@ecena.com",
+    "password": "securepassword1234"
+}
+```
 
 ## User
-- GET /api/users/profile: Get user profile
-- PUT /api/users/profile: Update user profile
+- GET /users/profile: Get user profile
+- PUT /users/profile: Update user profile
 
 ## Blogs
 
-- GET /api/blogs: Get all blogs
-- GET /api/blogs/:id: Get a specific blog
-- POST /api/blogs: Create a new blog
-- PUT /api/blogs/:id: Update a blog
-- DELETE /api/blogs/:id: Delete a blog
-- POST /api/blogs/share: Share a blog
-- GET /api/blogs/shared: Get shared blogs
-- GET /api/blogs/category/:category: Get blogs by category
-- GET /api/users/:userId/blogs: Get user's blogs
+- GET /blogs: Get all blogs
+- GET /blogs/:id: Get a specific blog
+  
+- POST /blogs: Create a new blog
+  ```
+  {
+     "title": "My First Blog Post",
+     "content": "This is the content of my first blog post.",
+     "category": "Technology"
+  }
+  ```
+  
+- PUT /blogs/:id: Update a blog
+  ```
+  {
+     "title": "Updated Blog Post"",
+     "content": "This is the updated content of my blog post.",
+     "category": "Fintech"
+  }
+  ```
+- DELETE /blogs/:id: Delete a blog
+- POST /blogs/share: Share a blog with another user
+  ```
+  {
+    "blogId": 6,
+    "userId": 3,              // userid of person you want to share a particular blog with
+    "permission": "edit"       // type of permission: 'view' || 'edit'
+  }
+  ```
+  
+- GET /blogs/shared: Get shared blogs with you
+- GET /blogs/category/:category: Get blogs by category
+
 
 ## Frontend Structure
 ```
