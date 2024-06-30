@@ -2,6 +2,26 @@
 
 A full-stack blog application with user authentication, CRUD operations for blog posts, and blog sharing functionality.
 
+## Table of Contents
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+- [Setup](#setup)
+  - [Backend Setup](#backend-setup)
+  - [Frontend Setup](#frontend-setup)
+- [Prisma Schema](#prisma-schema)
+- [API Endpoints](#api-endpoints)
+  - [Authentication](#authentication)
+  - [User](#user)
+  - [Blogs](#blogs)
+- [Frontend Structure](#frontend-structure)
+- [Screenshots](#screenshots)
+  - [Home Page](#home-page)
+  - [User Dashboard](#user-dashboard)
+  - [Create New Blog](#create-new-blog)
+- [Deployed URLs](#deployed-urls)
+
 ## Features
 
 - User registration and authentication
@@ -206,4 +226,9 @@ src/
 
 ### Create New Blog 
 ![Screenshot 2024-06-30 at 3 57 54 PM](https://github.com/shubhsardana29/vecros-blog-app/assets/52607235/14caf41f-64f3-4519-b402-4b5b80960e8f)
+
+## Deployed URLs
+
+- Backend API: [https://vecros-blog-app-cyzb.onrender.com](https://vecros-blog-app-cyzb.onrender.com)
+- Frontend Application: [https://vecros-blog-app-redux.netlify.app](https://vecros-blog-app-redux.netlify.app/)
 
